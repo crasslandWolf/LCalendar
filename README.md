@@ -33,3 +33,34 @@ calendar.init({
 ...
 ```
 调用起来非常简单，代码我后续会持续优化，如果喜欢希望赏颗星哦。
+
+### 使用时遇见的bug(滑动过程中，没有停止就确定会报错)
+解决办法:
+将js文件中的取消方法(line 689~702)修改一下:
+```
+function closeMobileCalendar(e) {
+    e.preventDefault();
+    var evt;
+    try {
+        evt = new CustomEvent('input');
+    } catch (e) {
+        //兼容旧浏览器(注意：该方法已从最新的web标准中删除)
+        evt = document.createEvent('Event');
+        evt.initEvent('input', true, true);
+    }
+    _self.trigger.dispatchEvent(evt);
+    document.body.removeChild(_self.gearDate);
+    _self.gearDate=null;
+}
+```
+将上面代码修改为以下代码:
+```
+function closeMobileCalendar(e) {
+    e.preventDefault();
+    var evt = new CustomEvent('input');
+    _self.trigger.dispatchEvent(evt);
+    document.body.removeChild(_self.gearDate);
+}
+```
+
+
